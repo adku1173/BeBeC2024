@@ -5,20 +5,22 @@ from acoupipe.datasets.experimental import DatasetMIRACLEConfig
 from acoupipe.datasets.synthetic import DatasetSynthetic as DatasetSynthetic
 from acoupipe.datasets.synthetic import DatasetSyntheticConfig
 from scipy.stats import norm, randint
-from traits.api import Float
+from traits.api import Float, Bool
 
 
 class DatasetSyntheticConfigBeBeC2024(DatasetSyntheticConfig):
-    """Dataset configuration for the Berlin Beamforming Conference 2024 paper.
+    """Dataset configuration for the Berlin Beamforming Conference 2024.
 
     Other than the BaseSynthetic, the following changes are applied:
 
     * minimum distance between sources of 0.015*aperture
     * uniformly distributed number of sources is used
     * distance to array source plane z=ap
+    * randomize signal length
     """
 
-    z_ap = Float(1.0, desc='Distance to array source plane in aperture units')
+    z_ap = Float(0.5)
+    random_signal_length = Bool(True, desc='randomize signal length')
 
     def create_nsources_sampler(self):
         return sp.NumericAttributeSampler(
@@ -60,6 +62,8 @@ class DatasetSyntheticConfigBeBeC2024(DatasetSyntheticConfig):
 
 
 class DatasetMIRACLEConfigBeBeC2024(DatasetMIRACLEConfig):
+
+    random_signal_length = Bool(True, desc='randomize signal length')
 
     def create_nsources_sampler(self):
         return sp.NumericAttributeSampler(
