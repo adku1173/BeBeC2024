@@ -1,0 +1,162 @@
+use_lr_scheduler= false
+use_wd_scheduler= false
+epochs= 250
+steps_per_epoch= 2000
+#session_dir = '/workspace/training/vit/sessions/bebec2024'
+learning_rate= 0.00025
+weight_decay= 0.00001
+sessionname= 'config_vit_he8_z-ap_hpc'
+
+[model]
+
+    cls_name="EigmodeTransformer"
+    [model.args]
+        batchsize = 50
+        preprocess = false
+        neig = 10
+        freq_enc = false
+        lam=1.0
+
+# training and validation datasets (multifreq)
+[[datasets]]
+      
+    cls_name="DatasetSynthetic"
+    config_cls_name="DatasetSyntheticConfigBeBeC2024"
+
+    [datasets.args]
+        tasks = 12
+        random_signal_length = true
+        
+    [datasets.config_args]
+        mode = 'wishart'
+        z_ap = 1.0
+
+    [datasets.pipeline]
+        cls_name = "CharacterizationPipeline"
+
+        [datasets.pipeline.args]
+            strength_label = "source_strength_estimated"
+            dim = 2
+            preprocess = true
+            shift_loc = true
+            neig = 10
+            freq_enc = false
+
+    [datasets.training]
+
+        split = 'training'
+        he_min=8.0
+        he_max=8.0
+        batchsize = 50
+        shuffle = false
+        size = 500000000
+        prefetch_size = 10
+        cache = false
+
+# training and validation datasets (multifreq)
+[[datasets]]
+      
+    cls_name="DatasetSynthetic"
+    config_cls_name="DatasetSyntheticConfigBeBeC2024"
+
+    [datasets.args]
+        tasks = 1
+        random_signal_length = true
+        
+    [datasets.config_args]
+        mode = 'wishart'
+        z_ap = 1.0
+
+    [datasets.pipeline]
+        cls_name = "CharacterizationPipeline"
+
+        [datasets.pipeline.args]
+            strength_label = "source_strength_estimated"
+            dim = 2
+            preprocess = true
+            shift_loc = true
+            neig = 10
+            freq_enc = false
+
+    [datasets.validation]
+
+        split = 'validation'
+        he_min=8.0
+        he_max=8.0
+        batchsize = 50
+        shuffle = false
+        size = 500
+        cache = true
+
+# test dataset experimental
+[[datasets]]
+      
+    cls_name="DatasetMIRACLE"
+    config_cls_name="DatasetMIRACLEConfigBeBeC2024"
+
+    [datasets.args]
+        tasks = 1
+        random_signal_length = true
+        
+    [datasets.config_args]
+        mode = 'wishart'
+        scenario = 'A2'
+        #srir_dir='/workspace/srir'
+    
+    [datasets.pipeline]
+        cls_name = "CharacterizationPipeline"
+
+        [datasets.pipeline.args]
+            strength_label = "source_strength_estimated"
+            dim = 2
+            preprocess = true
+            shift_loc = true
+            neig = 10
+            freq_enc = false
+
+    [datasets.test]
+
+        split = 'validation'
+        he_min=8.0
+        he_max=8.0
+        batchsize = 50
+        shuffle = false
+        size = 500
+        cache = true
+
+
+# test dataset experimental
+[[datasets]]
+      
+    cls_name="DatasetMIRACLE"
+    config_cls_name="DatasetMIRACLEConfigBeBeC2024"
+
+    [datasets.args]
+        tasks = 1
+        random_signal_length = true
+        
+    [datasets.config_args]
+        mode = 'wishart'
+        scenario = 'R2'
+        #srir_dir='/workspace/srir'
+    
+    [datasets.pipeline]
+        cls_name = "CharacterizationPipeline"
+
+        [datasets.pipeline.args]
+            strength_label = "source_strength_estimated"
+            dim = 2
+            preprocess = true
+            shift_loc = true
+            neig = 10
+            freq_enc = false
+
+    [datasets.test]
+
+        split = 'validation'
+        he_min=8.0
+        he_max=8.0
+        batchsize = 50
+        shuffle = false
+        size = 500
+        cache = true
