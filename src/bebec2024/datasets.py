@@ -20,65 +20,67 @@ class DatasetSyntheticConfigBeBeC2024(DatasetSyntheticConfig):
     """
 
     z_ap = Float(0.5)
-    random_signal_length = Bool(True, desc='randomize signal length')
+    random_signal_length = Bool(True, desc="randomize signal length")
 
     def create_nsources_sampler(self):
         return sp.NumericAttributeSampler(
-            random_var = randint(self.min_nsources, self.max_nsources+1),
-            attribute = 'nsources',
-            equal_value = True,
+            random_var=randint(self.min_nsources, self.max_nsources + 1),
+            attribute="nsources",
+            equal_value=True,
             target=[self.location_sampler],
-            )
+        )
 
     def create_grid(self):
         ap = self.mics.aperture
-        return ac.RectGrid(y_min=-0.5*ap, y_max=0.5*ap, x_min=-0.5*ap, x_max=0.5*ap,
-                                    z=self.z_ap*ap, increment=1/63*ap)
+        return ac.RectGrid(
+            y_min=-0.5 * ap,
+            y_max=0.5 * ap,
+            x_min=-0.5 * ap,
+            x_max=0.5 * ap,
+            z=self.z_ap * ap,
+            increment=1 / 63 * ap,
+        )
 
     def create_location_sampler(self):
         ap = self.mics.aperture
-        z = self.z_ap*ap
+        z = self.z_ap * ap
         location_sampler = sp.LocationSampler(
-            random_var = (norm(0,0.1688*ap),norm(0,0.1688*ap),norm(z,0)),
-            x_bounds = (-0.5*ap,0.5*ap),
-            y_bounds = (-0.5*ap,0.5*ap),
-            nsources = self.max_nsources,
-            mindist = 0.015*ap,
-            )
+            random_var=(norm(0, 0.1688 * ap), norm(0, 0.1688 * ap), norm(z, 0)),
+            x_bounds=(-0.5 * ap, 0.5 * ap),
+            y_bounds=(-0.5 * ap, 0.5 * ap),
+            nsources=self.max_nsources,
+            mindist=0.015 * ap,
+        )
         if self.snap_to_grid:
             location_sampler.grid = self.source_grid
         return location_sampler
 
-
     def create_beamformer(self):
         return ac.BeamformerCleansc(
             r_diag=False,
-            precision='float32',
+            precision="float32",
             cached=False,
-            freq_data = self.freq_data,
-            steer = self.steer,
-            )
-
+            freq_data=self.freq_data,
+            steer=self.steer,
+        )
 
 
 class DatasetMIRACLEConfigBeBeC2024(DatasetMIRACLEConfig):
-
-    random_signal_length = Bool(True, desc='randomize signal length')
+    random_signal_length = Bool(True, desc="randomize signal length")
 
     def create_nsources_sampler(self):
         return sp.NumericAttributeSampler(
-            random_var = randint(self.min_nsources, self.max_nsources+1),
-            attribute = 'nsources',
-            equal_value = True,
+            random_var=randint(self.min_nsources, self.max_nsources + 1),
+            attribute="nsources",
+            equal_value=True,
             target=[self.location_sampler],
-            )
+        )
 
     def create_beamformer(self):
         return ac.BeamformerCleansc(
             r_diag=False,
-            precision='float32',
+            precision="float32",
             cached=False,
-            freq_data = self.freq_data,
-            steer = self.steer,
-            )
-
+            freq_data=self.freq_data,
+            steer=self.steer,
+        )

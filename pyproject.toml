@@ -1,0 +1,19 @@
+[project]
+name = "bebec2024"
+version = "1.0.0"
+description = "source code for the 2024 Berlin Beamforming Conference (BeBeC) paper: Towards generalization of frequency-invariant deep learning models for grid-free source characterization"
+readme = "README.md"
+requires-python = ">=3.6"
+authors = [
+    {name = "Adam Kujawski", email = "adam.kujawski@tu-berlin.de"},
+]
+dependencies = [
+    "toml",
+    "tensorflow==2.15",
+    "acoupipe @ git+https://github.com/adku1173/acoupipe@c4cebc0fc0b52d7081a991de1a1e84de408f2a7f",
+]
+
+[project.urls]
+repository = "https://github.com/adku1173/BeBeC2024"
+
+

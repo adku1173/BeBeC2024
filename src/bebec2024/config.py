@@ -10,36 +10,39 @@ import toml
 import bebec2024
 from bebec2024.pipeline import CharacterizationPipeline
 
-default_session_dir = Path(bebec2024.__file__).parent / 'sessions'
+default_session_dir = Path(bebec2024.__file__).parent / "sessions"
+
 
 @dataclass
 class ConfigModel:
-
     cls_name: str
     args: dict
 
     def create_instance(self):
-        if not hasattr(self, '_instance'):
-            cls_name = getattr(importlib.import_module('bebec2024.models'),self.cls_name)
+        if not hasattr(self, "_instance"):
+            cls_name = getattr(
+                importlib.import_module("bebec2024.models"), self.cls_name
+            )
             self._instance = cls_name(**self.args)
         return self._instance
 
+
 @dataclass
 class ConfigPipeline:
-
     cls_name: str
     args: dict
 
     def create_instance(self):
-        if not hasattr(self, '_instance'):
-            cls_name = getattr(importlib.import_module('bebec2024.pipeline'),self.cls_name)
+        if not hasattr(self, "_instance"):
+            cls_name = getattr(
+                importlib.import_module("bebec2024.pipeline"), self.cls_name
+            )
             self._instance = cls_name(**self.args)
         return self._instance
 
 
 @dataclass
 class ConfigSplit:
-
     split: str
     size: int
     f: float = None
@@ -57,9 +60,9 @@ class ConfigSplit:
     num: int = 0
     features: list[str] = None
 
+
 @dataclass
 class ConfigDataset:
-
     cls_name: str
     args: dict
     config_cls_name: str = None
@@ -70,12 +73,16 @@ class ConfigDataset:
     test: ConfigSplit = None
 
     def create_instance(self):
-        if not hasattr(self, '_instance'):
-            dataset_cls = getattr(importlib.import_module('bebec2024.datasets'),self.cls_name)
+        if not hasattr(self, "_instance"):
+            dataset_cls = getattr(
+                importlib.import_module("bebec2024.datasets"), self.cls_name
+            )
             if self.config_cls_name is None:
                 self._instance = dataset_cls(**self.args)
             else:
-                config_cls = getattr(importlib.import_module('bebec2024.datasets'),self.config_cls_name)
+                config_cls = getattr(
+                    importlib.import_module("bebec2024.datasets"), self.config_cls_name
+                )
                 config = config_cls(**self.config_args)
                 self._instance = dataset_cls(config=config, **self.args)
         return self._instance
@@ -88,16 +95,18 @@ class ConfigDataset:
     def get_training_generator(self, **kwargs):
         dataset = self.create_instance()
         dataset_kwargs = {
-            'split': self.training.split,
-            'size': self.training.size,
-            'he_min': self.training.he_min,
-            'he_max': self.training.he_max,
-            'progress_bar': self.training.progress_bar,
-            'start_idx': self.training.start_idx,
-            'num': self.training.num,
-            'features': self.training.features,
+            "split": self.training.split,
+            "size": self.training.size,
+            "he_min": self.training.he_min,
+            "he_max": self.training.he_max,
+            "progress_bar": self.training.progress_bar,
+            "start_idx": self.training.start_idx,
+            "num": self.training.num,
+            "features": self.training.features,
         }
-        dataset_kwargs = CharacterizationPipeline.filter_kwargs(dataset, **dataset_kwargs)
+        dataset_kwargs = CharacterizationPipeline.filter_kwargs(
+            dataset, **dataset_kwargs
+        )
         dataset_kwargs.update(kwargs)
         return dataset.generate(**dataset_kwargs)
 
@@ -109,16 +118,18 @@ class ConfigDataset:
     def get_validation_generator(self, **kwargs):
         dataset = self.create_instance()
         dataset_kwargs = {
-            'split': self.validation.split,
-            'size': self.validation.size,
-            'he_min': self.validation.he_min,
-            'he_max': self.validation.he_max,
-            'progress_bar': self.validation.progress_bar,
-            'start_idx': self.validation.start_idx,
-            'num': self.validation.num,
-            'features': self.validation.features,
+            "split": self.validation.split,
+            "size": self.validation.size,
+            "he_min": self.validation.he_min,
+            "he_max": self.validation.he_max,
+            "progress_bar": self.validation.progress_bar,
+            "start_idx": self.validation.start_idx,
+            "num": self.validation.num,
+            "features": self.validation.features,
         }
-        dataset_kwargs = CharacterizationPipeline.filter_kwargs(dataset, **dataset_kwargs)
+        dataset_kwargs = CharacterizationPipeline.filter_kwargs(
+            dataset, **dataset_kwargs
+        )
         dataset_kwargs.update(kwargs)
         return dataset.generate(**dataset_kwargs)
 
@@ -130,27 +141,29 @@ class ConfigDataset:
     def get_test_generator(self, **kwargs):
         dataset = self.create_instance()
         dataset_kwargs = {
-            'split': self.test.split,
-            'size': self.test.size,
-            'he_min': self.test.he_min,
-            'he_max': self.test.he_max,
-            'progress_bar': self.test.progress_bar,
-            'start_idx': self.test.start_idx,
-            'num': self.test.num,
-            'features': self.test.features,
+            "split": self.test.split,
+            "size": self.test.size,
+            "he_min": self.test.he_min,
+            "he_max": self.test.he_max,
+            "progress_bar": self.test.progress_bar,
+            "start_idx": self.test.start_idx,
+            "num": self.test.num,
+            "features": self.test.features,
         }
-        dataset_kwargs = CharacterizationPipeline.filter_kwargs(dataset, **dataset_kwargs)
+        dataset_kwargs = CharacterizationPipeline.filter_kwargs(
+            dataset, **dataset_kwargs
+        )
         dataset_kwargs.update(kwargs)
         return dataset.generate(**dataset_kwargs)
 
+
 @dataclass
 class ConfigBase:
-
     datasets: list[ConfigDataset]
     model: ConfigModel
     session_dir: str = str(default_session_dir.resolve())
-    log_dir_name: str = 'tensorboard'
-    ckpt_dir_name: str = 'ckpt'
+    log_dir_name: str = "tensorboard"
+    ckpt_dir_name: str = "ckpt"
     sessionname: str = None
     # initialized from init
     log_dir: Path = field(init=False)
@@ -169,7 +182,6 @@ class ConfigBase:
         self.set_log_dir()
         self.set_ckpt_dir()
 
-
     def compare_signature(self):
         default_params = inspect.signature(self.__class__).parameters
         return {
@@ -181,27 +193,47 @@ class ConfigBase:
     def set_sessionname(self):
         diff_dict = self.compare_signature()
         if self.sessionname is None:
-            kwstr = '_'.join([f'{k}{v}' for k,v in diff_dict.items() if k not in [
-                'pipeline','training','datasets','model','session_dir']])
+            kwstr = "_".join(
+                [
+                    f"{k}{v}"
+                    for k, v in diff_dict.items()
+                    if k
+                    not in ["pipeline", "training", "datasets", "model", "session_dir"]
+                ]
+            )
             sessionname = f"{self.model.cls_name}_{kwstr}_{datetime.now().strftime('%Y-%m-%d_%H-%M')}"
             self.sessionname = sessionname
 
     def set_log_dir(self):
-        self.log_dir = str(Path(self.session_dir, self.__class__.__name__, self.sessionname, self.log_dir_name).resolve())
+        self.log_dir = str(
+            Path(
+                self.session_dir,
+                self.__class__.__name__,
+                self.sessionname,
+                self.log_dir_name,
+            ).resolve()
+        )
 
     def set_ckpt_dir(self):
-        self.ckpt_dir = str(Path(self.session_dir, self.__class__.__name__, self.sessionname, self.ckpt_dir_name).resolve())
+        self.ckpt_dir = str(
+            Path(
+                self.session_dir,
+                self.__class__.__name__,
+                self.sessionname,
+                self.ckpt_dir_name,
+            ).resolve()
+        )
 
     def to_json(self, file=None):
         if file is None:
-            file = self._handle_filepath('config.json')
-        with open(file, 'w') as f:
+            file = self._handle_filepath("config.json")
+        with open(file, "w") as f:
             json.dump(asdict(self), f, indent=4, sort_keys=True)
 
     def to_toml(self, file=None):
         if file is None:
-            file = self._handle_filepath('config.toml')
-        with open(file, 'w') as f:
+            file = self._handle_filepath("config.toml")
+        with open(file, "w") as f:
             toml.dump(asdict(self), f)
 
     def _handle_filepath(self, filename):
@@ -212,33 +244,33 @@ class ConfigBase:
     @classmethod
     def from_toml(cls, file):
         file = Path(file).resolve()
-        assert file.exists(), f'file missing: {file}'
+        assert file.exists(), f"file missing: {file}"
         data = toml.load(file)
-        if data.get('datasets'):
+        if data.get("datasets"):
             datasets = []
-            for v in data['datasets']:
-                if v.get('pipeline'):
-                    v['pipeline'] = ConfigPipeline(**v['pipeline'])
-                if v.get('training'):
-                    v['training'] = ConfigSplit(**v['training'])
-                if v.get('validation'):
-                    v['validation'] = ConfigSplit(**v['validation'])
-                if v.get('test'):
-                    v['test'] = ConfigSplit(**v['test'])
+            for v in data["datasets"]:
+                if v.get("pipeline"):
+                    v["pipeline"] = ConfigPipeline(**v["pipeline"])
+                if v.get("training"):
+                    v["training"] = ConfigSplit(**v["training"])
+                if v.get("validation"):
+                    v["validation"] = ConfigSplit(**v["validation"])
+                if v.get("test"):
+                    v["test"] = ConfigSplit(**v["test"])
                 datasets.append(ConfigDataset(**v))
-            data['datasets'] = datasets
-        if data.get('model'):
-            data['model'] = ConfigModel(**data['model'])
+            data["datasets"] = datasets
+        if data.get("model"):
+            data["model"] = ConfigModel(**data["model"])
         # pop log_dir and ckpt_dir
-        if data.get('log_dir'):
-            data.pop('log_dir')
-        if data.get('ckpt_dir'):
-            data.pop('ckpt_dir')
+        if data.get("log_dir"):
+            data.pop("log_dir")
+        if data.get("ckpt_dir"):
+            data.pop("ckpt_dir")
         return cls(**data)
 
     def set_attributes_from_toml(self, file):
         file = Path(file).resolve()
-        assert file.exists(), f'file missing: {file}'
+        assert file.exists(), f"file missing: {file}"
         data = toml.load(file)
         for k, v in data.items():
             setattr(self, k, v)
